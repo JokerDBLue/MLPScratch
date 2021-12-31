@@ -34,9 +34,6 @@ class Menu:
         x_test = (x_test.astype(np.float32) - 127.5) / 127.5
         x_train = x_train.reshape(x_train.shape[0], -1)
         x_test = x_test.reshape(x_test.shape[0], -1)
-        # x_train = [[x_ij / 255 for x_i in x for x_ij in x_i] for x in x_train]
-        # x_test = [[x_ij / 255 for x_i in x for x_ij in x_i] for x in x_test]
-        # one-hot encoding for the results
         y_train = [[1 if d == i else 0 for i in range(10)] for d in y_train]
         y_test = np.array([[1 if d == i else 0 for i in range(10)] for d in y_test])
         # validation

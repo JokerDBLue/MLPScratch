@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, output_size, activation=None):
         self.dweights = None
         self.dbiases = None
         self.dinputs = None

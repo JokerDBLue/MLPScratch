@@ -99,15 +99,19 @@ class Network:
         # smaple = len(results)
         y = np.array(expected_results)
         results_clipped = np.clip(results, 1e-7, 1 - 1e-7)
-        correct_confidences = np.sum(results_clipped * y, axis=1)
-        negative_log_likelihoods = -np.log(correct_confidences)
+        correct_confidences = np.sum(y * np.log(results_clipped), axis=1)
+        negative_log_likelihoods = -correct_confidences
         return np.mean(negative_log_likelihoods)
+
 
     @staticmethod
     def loss_der(results, expected_results):
         samples = len(results)
+        labels = len(results[0])
         results_clipped = np.clip(results, 1e-7, 1 - 1e-7)
-        dinputs = - np.array(expected_results) / results_clipped
+        if len(expected_results.shape) == 1:
+            expected_results = np.eye(labels)[expected_results]
+        dinputs = -(expected_results / results_clipped)
         dinputs = dinputs / samples
         return dinputs
 
