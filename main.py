@@ -50,9 +50,9 @@ class Menu:
         self.network.add_layer(784, 16)
         self.network.add_layer(16, 16)
         self.network.add_layer(16, 10)
-        self.network.set_batches(200)
-        self.network.set_learning_rate(0.005)
-        self.network.set_epochs(5)
+        self.network.set_batches(28)
+        self.network.set_learning_rate(0.001)
+        self.network.set_epochs(3)
 
     def add_layer2network(self):
         if not self.network_exist:

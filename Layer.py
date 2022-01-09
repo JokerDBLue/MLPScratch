@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, input_size, output_size, activation=None):
+    def __init__(self, input_size, output_size):
         self.dweights = None
         self.dbiases = None
         self.dinputs = None
@@ -10,8 +10,8 @@ class Layer:
         self._output_size = output_size
         self.input = None
         np.random.seed(seed=None)
-        self.weights = 0.01 * np.random.randn(input_size, output_size).astype(np.float32)
-        self.biases = 0.01 * np.random.randn(1, output_size).astype(np.float32)  # np.zeros((1, output_size)).astype(np.float32)
+        self.weights = 0.001 * np.random.randn(input_size, output_size).astype(np.float32)
+        self.biases = 0.001 * np.random.randn(1, output_size).astype(np.float32)  # np.zeros((1, output_size)).astype(np.float32)
         self.output = None
 
     def get_input(self):
@@ -29,12 +29,12 @@ class Layer:
     def get_outputs(self):
         return self.output
 
-    @staticmethod
-    def sigmoid(x):
+    def sigmoid(self, x):
+        self.sig_input = x
         return 1 / (1 + np.exp(-x))
 
     def sigmoid_der(self, x):
-        sig = self.sigmoid(x) * (1 - self.sigmoid(x))
+        sig = x * (1 - self.output) * self.output
         return sig
 
     def forward_layer(self, input_data):

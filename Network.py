@@ -20,7 +20,7 @@ class Network:
     def set_epochs(self, epochs):
         self.epochs = epochs
 
-    def add_layer(self, input_size, output_size):
+    def add_layer(self, input_size, output_size, activation=None):
         if self.layers is None:
             self.layers = []
         if len(self.layers) > 0:
@@ -119,7 +119,7 @@ class Network:
         dinputs = self.loss_der(output_values, expected_results)
         x = dinputs[:]
         for i in range(len(self.layers) - 1, -1, -1):
-            x = self.layers[i].backward_layer(x)
+            x = self.layers[i].backward_layer(x)[:]
 
     def update_layers(self):
         for i in range(len(self.layers)):
@@ -143,11 +143,29 @@ class Network:
                 self.backward(results,
                               expected_output[b * self.batches:b * self.batches + self.batches])
                 self.update_layers()
-                print(f"Epoch {e +1}/{self.epochs}, Batch {b}, loss {accumulated_loss / (b + 1)}, accuracy {accumulated_acc / (b + 1)}")
+                print(f"Epoch {e +1}/{self.epochs}, Batch {b}, loss {accumulated_loss / (b + 1)}, "
+                      f"accuracy {accumulated_acc / (b + 1)}")
             val_results = self.forward(val_in)
             val_loss = self.loss(val_results, val_out)
             val_acc = self.accuracy(val_results, val_out)
             print(f"val_loss {val_loss}, val_accuracy {val_acc}")
+
+    def confidence(self, results, y):
+        predictions = np.argmax(results, axis=1)
+        if len(y.shape) == 2:
+            y = np.argmax(y, axis=1)
+        correctness = list(predictions == y)
+        avg_conf = np.mean(results)
+        c_conf = 0
+        w_conf = 0
+        for i in range(len(predictions)):
+            if correctness[i]:
+                c_conf += results[i, predictions[i]]
+            else:
+                w_conf += results[i, predictions[i]]
+        c_conf = c_conf / len(predictions)
+        w_conf = w_conf / len(predictions)
+        return avg_conf, c_conf, w_conf
 
     def evaluate(self, x, y, t="test"):
         results = self.forward(x)
@@ -156,6 +174,6 @@ class Network:
         p = self.precision(results, y)
         r = self.recall(results, y)
         f1 = self.f1_score(p, r)
-
+        conf, c_conf, w_conf = self.confidence(results, y)
         print(f'{t}_data | loss: {loss} | acc: {acc} | p: {p} | r: {r} | f1_score: {f1}')
-
+        print(f'avg conf: {conf} | avg c conf: {c_conf} | avg w conf {w_conf}')
